@@ -23,5 +23,8 @@ Route::group([
     'middleware' => 'cors'
 ], function ($router) {
     Route::apiResource('/customers', 'CustomerController');
-    Route::post('/customers/addBeers', 'CustomerController@addBeers');
+    Route::get('/orders', 'OrderController@index');
+    Route::get('/orders/{customerId}', 'OrderController@getOrdersByCustomer');
+    Route::post('/orders/addOrder', 'OrderController@addOrder');
+    Route::delete('/orders/{id}', 'OrderController@destroy');
 });

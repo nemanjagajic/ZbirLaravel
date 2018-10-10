@@ -12,6 +12,6 @@ class Customer extends Model
 
     public function beers()
     {
-        return $this->belongsToMany('App\Beer');
+        return $this->belongsToMany('App\Beer')->withTimestamps();
     }
 }

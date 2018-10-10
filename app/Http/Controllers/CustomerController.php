@@ -77,22 +77,4 @@ class CustomerController extends Controller
 
         return response("Successfully deleted customer with id $id");
     }
-
-    public function addBeers(Request $request)
-    {
-        $validatedData = $request->validate([
-            'userId' => 'required',
-            'beerId' => 'required'
-        ]);
-
-        $customer = Customer::findOrFail($request->userId);
-
-        if ($request->count) {
-            $customer->beers()->attach($request->beerId, ['count' => $request->count]);
-        } else {
-            $customer->beers()->attach($request->beerId);
-        }
-
-        return response("Beer with id {$request->beerId} successfully ordered");
-    }
 }
