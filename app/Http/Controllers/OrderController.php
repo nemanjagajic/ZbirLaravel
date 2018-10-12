@@ -7,6 +7,7 @@ use App\Order;
 use App\Customer;
 use App\Beer;
 use App\Http\Resources\OrderResource;
+use App\Http\Resources\OrderPrintableResource;
 
 class OrderController extends Controller
 {
@@ -48,6 +49,18 @@ class OrderController extends Controller
         }
 
         return $result;
+    }
+
+    public function getPrintableOrders()
+    {
+        $response = [];
+        $orders = Order::all();
+
+        foreach ($orders as $order) {
+            array_push($response, new OrderPrintableResource($order));
+        }
+
+        return $response;
     }
 
     public function destroy($id)
