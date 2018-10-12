@@ -8,6 +8,7 @@ use App\Customer;
 use App\Beer;
 use App\Http\Resources\OrderResource;
 use App\Http\Resources\OrderPrintableResource;
+use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
@@ -28,13 +29,25 @@ class OrderController extends Controller
         // Fail if beer doesn't exist
         Beer::findOrFail($request->beerId);
 
+        $insertedOrderId = -1;
         if ($request->count) {
-            $customer->beers()->attach($request->beerId, ['count' => $request->count]);
+            $insertedOrderId = DB::table('beer_customer')->insertGetId([
+                'beer_id' => $request->beerId,
+                'customer_id' => $request->userId,
+                'count' => $request->count,
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s')
+            ]);
         } else {
-            $customer->beers()->attach($request->beerId);
+            $insertedOrderId = DB::table('beer_customer')->insertGetId([
+                'beer_id' => $request->beerId,
+                'customer_id' => $request->userId,
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s')
+            ]);
         }
 
-        return response("Beer with id {$request->beerId} successfully ordered");
+        return new OrderPrintableResource(Order::findOrFail($insertedOrderId));
     }
 
     public function getOrdersByCustomer($customerId)
