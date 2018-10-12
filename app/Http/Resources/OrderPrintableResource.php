@@ -18,8 +18,8 @@ class OrderPrintableResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'username' => Customer::findOrFail($this->customer_id)->username,
-            'beerName' => Beer::findOrFail($this->beer_id)->name,
+            'username' => Customer::find($this->customer_id) ? Customer::find($this->customer_id)->username : 'removed user',
+            'beerName' => Beer::find($this->beer_id) ? Beer::find($this->beer_id)->name : 'removed beer',
             'count' => $this->count
         ];
     }

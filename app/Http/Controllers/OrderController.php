@@ -14,7 +14,7 @@ class OrderController extends Controller
 {
     public function index()
     {
-        return OrderResource::collection(Order::all());
+        return OrderResource::collection(Order::orderBy('created_at','desc')->get());
     }
 
     public function addOrder(Request $request)
@@ -67,7 +67,7 @@ class OrderController extends Controller
     public function getPrintableOrders()
     {
         $response = [];
-        $orders = Order::all();
+        $orders = Order::orderBy('created_at','desc')->get();
 
         foreach ($orders as $order) {
             array_push($response, new OrderPrintableResource($order));

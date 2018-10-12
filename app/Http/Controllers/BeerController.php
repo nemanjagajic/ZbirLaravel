@@ -15,7 +15,7 @@ class BeerController extends Controller
      */
     public function index()
     {
-        return BeerResource::collection(Beer::all());
+        return BeerResource::collection(Beer::orderBy('created_at','desc')->get());
     }
 
     /**

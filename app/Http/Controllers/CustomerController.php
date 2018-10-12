@@ -15,7 +15,7 @@ class CustomerController extends Controller
      */
     public function index()
     {
-        return CustomerResource::collection(Customer::all());
+        return CustomerResource::collection(Customer::orderBy('created_at','desc')->get());
     }
 
     /**
