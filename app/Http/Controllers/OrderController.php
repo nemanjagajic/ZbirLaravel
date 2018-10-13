@@ -38,18 +38,29 @@ class OrderController extends Controller
     {
         $offset = ($page - 1) * $showPerPage;
 
+        $route = URL::route('ordersPrintable');
         $previous = null;
         $next = null;
 
         if ($page == 1) {
             $previous = false;
         } else {
-            $previous = URL::route('ordersPrintable');
+            $previousPage = $page - 1;
+            $previous = "$route?page=$previousPage&showPerPage=$showPerPage";
+        }
+
+        $lastPage = ceil(sizeof($items) / $showPerPage); 
+        if ($page == $lastPage) {
+            $next = false;
+        } else {
+            $nextPage = $page + 1;
+            $next = "$route?page=$nextPage&showPerPage=$showPerPage";
         }
 
         return response()->json([
             'orders' => array_slice($items, $offset, $showPerPage),
-            'previous' => $previous
+            'previous' => $previous,
+            'next' => $next
         ]);
     }
 
