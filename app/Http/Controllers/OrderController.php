@@ -59,6 +59,7 @@ class OrderController extends Controller
 
         return response()->json([
             'orders' => array_slice($items, $offset, $showPerPage),
+            'currentPage' => $page,
             'previous' => $previous,
             'next' => $next
         ]);
