@@ -9,6 +9,8 @@ use App\Beer;
 use App\Http\Resources\OrderResource;
 use App\Http\Resources\OrderPrintableResource;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\Input;
 
 class OrderController extends Controller
 {
@@ -17,15 +19,10 @@ class OrderController extends Controller
         return OrderResource::collection(Order::orderBy('created_at','desc')->get());
     }
 
-    public function getPrintableOrders(Request $request)
+    public function getPrintableOrders()
     {
-        $validatedData = $request->validate([
-            'page' => 'required|integer',
-            'showPerPage' => 'required|integer'
-        ]);
-
-        $page = $request->page > 0 ? $request->page : 1;
-        $showPerPage = $request->showPerPage > 0 ? $request->showPerPage : 5;
+        $page = Input::get('page') &&  Input::get('page') > 0 ? Input::get('page') : 1;
+        $showPerPage = Input::get('showPerPage') && Input::get('showPerPage') > 0 ? Input::get('showPerPage') : 5;
 
         $ordersResult = [];
         $orders = Order::orderBy('created_at','desc')->get();
@@ -34,13 +31,26 @@ class OrderController extends Controller
             array_push($ordersResult, new OrderPrintableResource($order));
         }
 
-        return $this->getSelectedPage($ordersResult, $page, $showPerPage);
+        return $this->getSelectedPageResponse($ordersResult, $page, $showPerPage);
     }
 
-    private function getSelectedPage($items, $page, $showPerPage)
+    private function getSelectedPageResponse($items, $page, $showPerPage)
     {
         $offset = ($page - 1) * $showPerPage;
-        return array_slice($items, $offset, $showPerPage);
+
+        $previous = null;
+        $next = null;
+
+        if ($page == 1) {
+            $previous = false;
+        } else {
+            $previous = URL::route('ordersPrintable');
+        }
+
+        return response()->json([
+            'orders' => array_slice($items, $offset, $showPerPage),
+            'previous' => $previous
+        ]);
     }
 
     public function addOrder(Request $request)
