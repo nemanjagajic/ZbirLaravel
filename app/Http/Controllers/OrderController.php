@@ -17,6 +17,32 @@ class OrderController extends Controller
         return OrderResource::collection(Order::orderBy('created_at','desc')->get());
     }
 
+    public function getPrintableOrders(Request $request)
+    {
+        $validatedData = $request->validate([
+            'page' => 'required|integer',
+            'showPerPage' => 'required|integer'
+        ]);
+
+        $page = $request->page > 0 ? $request->page : 1;
+        $showPerPage = $request->showPerPage > 0 ? $request->showPerPage : 5;
+
+        $ordersResult = [];
+        $orders = Order::orderBy('created_at','desc')->get();
+
+        foreach ($orders as $order) {
+            array_push($ordersResult, new OrderPrintableResource($order));
+        }
+
+        return $this->getSelectedPage($ordersResult, $page, $showPerPage);
+    }
+
+    private function getSelectedPage($items, $page, $showPerPage)
+    {
+        $offset = ($page - 1) * $showPerPage;
+        return array_slice($items, $offset, $showPerPage);
+    }
+
     public function addOrder(Request $request)
     {
         $validatedData = $request->validate([
@@ -62,18 +88,6 @@ class OrderController extends Controller
         }
 
         return $result;
-    }
-
-    public function getPrintableOrders()
-    {
-        $response = [];
-        $orders = Order::orderBy('created_at','desc')->get();
-
-        foreach ($orders as $order) {
-            array_push($response, new OrderPrintableResource($order));
-        }
-
-        return $response;
     }
 
     public function destroy($id)

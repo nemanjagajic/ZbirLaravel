@@ -25,7 +25,7 @@ Route::group([
     Route::apiResource('/customers', 'CustomerController');
     Route::get('/orders', 'OrderController@index');
     Route::get('/orders/{customerId}', 'OrderController@getOrdersByCustomer');
-    Route::get('/ordersPrintable', 'OrderController@getPrintableOrders');
+    Route::post('/ordersPrintable', 'OrderController@getPrintableOrders');
     Route::post('/orders/addOrder', 'OrderController@addOrder');
     Route::delete('/orders/{id}', 'OrderController@destroy');
 });
