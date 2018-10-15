@@ -26,6 +26,7 @@ Route::group([
     Route::get('/orders', 'OrderController@index');
     Route::get('/orders/{customerId}', 'OrderController@getOrdersByCustomer');
     Route::get('/ordersPrintable', 'OrderController@getPrintableOrders')->name('ordersPrintable');
+    Route::get('/getMostOrderedBeers/{numOfBeers}', 'OrderController@getMostOrderedBeers');
     Route::post('/orders/addOrder', 'OrderController@addOrder');
     Route::delete('/orders/{id}', 'OrderController@destroy');
 });

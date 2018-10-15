@@ -16,16 +16,16 @@ class OrderController extends Controller
 {
     public function index()
     {
-        return OrderResource::collection(Order::orderBy('created_at','desc')->get());
+        return OrderResource::collection(Order::orderBy('created_at', 'desc')->get());
     }
 
     public function getPrintableOrders()
     {
-        $page = Input::get('page') &&  Input::get('page') > 0 ? Input::get('page') : 1;
+        $page = Input::get('page') && Input::get('page') > 0 ? Input::get('page') : 1;
         $showPerPage = Input::get('showPerPage') && Input::get('showPerPage') > 0 ? Input::get('showPerPage') : 5;
 
         $ordersResult = [];
-        $orders = Order::orderBy('created_at','desc')->get();
+        $orders = Order::orderBy('created_at', 'desc')->get();
 
         foreach ($orders as $order) {
             array_push($ordersResult, new OrderPrintableResource($order));
@@ -49,7 +49,7 @@ class OrderController extends Controller
             $previous = "$route?page=$previousPage&showPerPage=$showPerPage";
         }
 
-        $lastPage = ceil(sizeof($items) / $showPerPage); 
+        $lastPage = ceil(sizeof($items) / $showPerPage);
         if ($page == $lastPage) {
             $next = false;
         } else {
@@ -63,6 +63,35 @@ class OrderController extends Controller
             'previous' => $previous,
             'next' => $next
         ]);
+    }
+
+    public function getMostOrderedBeers($numOfBeers)
+    {
+        $allBeers = Beer::all();
+        $beersWithOrders = [];
+
+        $numOfAllOrders = 0;
+        foreach (Order::all() as $order) {
+            $numOfAllOrders += $order->count;
+        }
+
+        foreach ($allBeers as $beer) {
+            $orders = Order::all()->where('beer_id', $beer->id);
+            $numOfOrders = 0;
+            foreach ($orders as $order) {
+                $numOfOrders += $order->count;
+            }
+            $beersWithOrders = $this->array_push_assoc($beersWithOrders, $beer->name, (int)(round($numOfOrders / $numOfAllOrders, 2) * 100));
+        }
+
+        arsort($beersWithOrders);
+        return response()->json(array_slice($beersWithOrders, 0, $numOfBeers));
+    }
+
+    private function array_push_assoc($array, $key, $value)
+    {
+        $array[$key] = $value;
+        return $array;
     }
 
     public function addOrder(Request $request)
